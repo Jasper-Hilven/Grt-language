@@ -1,6 +1,6 @@
-(ns test-counterclockwise.core-test
+(ns test-grt.core-test
   (:require [clojure.test :refer :all]
-            [test-counterclockwise.core :refer :all]))
+            [test-grt.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

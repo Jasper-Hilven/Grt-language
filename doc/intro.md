@@ -1,3 +1,3 @@
-# Introduction to test-counterclockwise
+# Introduction to grt
 
 TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
