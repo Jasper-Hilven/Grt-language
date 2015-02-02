@@ -129,6 +129,9 @@
                                  (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
 
 
+;;Functional way to speed up things, respecting the data structure and avoiding any type cyclic reference in our data
+(defn build-identifier-navigation [current-count remainder acc] (comment "TODO"))
+
 
 (comment (is (add-line "" 0) [{:type :newline, :text "", :char-pos 0, :l-number 0}])
          (is  (add-line "(" 0) [{:type :l-bracket, :text "(", :char-pos 0, :l-number 0}]))
