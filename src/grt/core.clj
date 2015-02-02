@@ -16,7 +16,7 @@
           acc
           (into acc [(cond 
                        (= cur-state :float-dot-direct) {:type :error :text "bad float ending" :char-pos startword-char-count :l-number l-number}
-                       :else {:type :error :text "bad ending of something" :char-pos startword-char-count :l-number l-number}
+                       :else {:type cur-state :text previous :char-pos startword-char-count :l-number l-number}
                        )]))
           (case cur-state
             :init (cond
@@ -54,7 +54,7 @@
             :char (cond 
                     (.contains text-number-char cur-char) (recur :id (inc char-count) startword-char-count (str previous cur-char) (rest rem-text) acc))
             :end-char (cond
-                  (.contains quote-char cur-char) (recur :init (inc char-count) (inc char-count) "" (rest rem-text) (into acc [{:type :char :text previous :char-pos startword-char-count :l-number l-number}]) ))))))))
+                  (.contains quote-char cur-char) (recur :init (inc char-count) (inc char-count) "" (rest rem-text) (into acc [{:type :char :text previous :char-pos startword-char-count :l-number l-number}])))))))))
 
 (defn lex-it [full-text]
   (loop [lexies '() remaining-text full-text line-number 0]
@@ -62,6 +62,35 @@
       (empty? remaining-text)
       lexies 
       (recur (concat lexies (add-line (first full-text) line-number )) (rest remaining-text) (+ line-number 1)))))
+
+
+(defn parse-by-parentheses [lexed access-index] 
+  (if (<= (count lexed)  access-index))
+    {:use 0 :size 0 :lex {:type :parse-error :subtype :empty :text "unvalid parse call on empty lex data" :is-leaf true}}
+      (let [toHandle (nth lexed access-index)
+            current-type (:type toHandle)]
+        (case current-type 
+          :int           {:use 1 :size 1 :lex toHandle :is-leaf true :type :int}
+          :float         {:use 1 :size 1 :lex toHandle :is-leaf true :type :float}
+          :id            {:use 1 :size 1 :lex toHandle :is-leaf true :type :id}
+          :space         {:use 1 :size 0 :lex toHandle :is-leaf true :type :space}
+          :error         {:use 1 :size 1 :lex toHandle :is-leaf true :type :lex-error}
+          :r-parenthesis {:use 1 :size 1 :lex toHandle :is-leaf true :type :r-parenthesis}
+          :r-hbracket    {:use 1 :size 1 :lex toHandle :is-leaf true :type :r-parenthesis}
+          :r-bracket     {:use 1 :size 1 :lex toHandle :is-leaf true :type :r-parenthesis}
+          :l-parenthesis ((loop [current-lexed (inc access-index) acc [] own-use 1]
+                            (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
+                                  type (:type part-of-the-cake)
+                                  usage (:use part-of-the-cake)]
+                              (case type
+                                :parse-error
+                                (case (:subtype part-of-the-cake)
+                                  :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf :false}
+                                  :else (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))
+                                :r-parenthesis {:use (inc own-use) :size 1 :l-par toHandle :r-par part-of-the-cake :mid acc :type :parenthesis :is-leaf :false}
+                                :l-hbracket {:use (inc own-use) }
+                                :l-bracket  {}
+                                :
 
 
 (comment (is (add-line "" 0) [{:type :newline, :text "", :char-pos 0, :l-number 0}])
