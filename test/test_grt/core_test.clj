@@ -14,6 +14,7 @@
            (is (add-line "(" 0) [{:type :l-bracket, :text "(", :char-pos 0, :l-number 0}]))
   (testing "close parenthesis"
            (is (add-line ")" 0) [{:type :r-bracket, :text ")", :char-pos 0, :l-number 0}])))
+
  (deftest failing-lexing
    (testing "int stuck to id"
             (let [int-id (add-line "1a" 0)]

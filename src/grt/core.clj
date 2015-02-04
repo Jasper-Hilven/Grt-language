@@ -129,8 +129,18 @@
                                  (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
 
 
-;;Functional way to speed up things, respecting the data structure and avoiding any type of cyclic reference in our data
-(defn build-identifier-navigation [current-count remainder acc] (comment "TODO"))
+(defn build-identifier-navigation [current-count remainder]
+  (if (:is-leaf remainder)
+    {:next-count (inc current-count) :annotated (assoc remainder :id current-count)}
+               (let [[new-count updated-mid]
+                              (loop [sub-current-count (inc current-count) remaining (:mid remainder) acc []]
+                                             (if (empty? remaining)
+                                                            [sub-current-count acc]
+                                                            (let [sub-nav (build-identifier-navigation sub-current-count (first remaining) )
+                                                                             updated-count (:next-count sub-nav)
+                                                                             updated-sub-nav (:annotated sub-nav)]
+                                                                           (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
+                   {:next-count new-count :annotated (assoc remainder :mid updated-mid :id current-count)})))
 
 
 (comment 
