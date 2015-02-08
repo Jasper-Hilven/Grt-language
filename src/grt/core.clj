@@ -1,5 +1,7 @@
 (ns grt.core)
 
+
+;;;;;;;;;;;;;lexing;;;;;;;;;;;;
 (defn add-line [text l-number]
   (let [number-char "0123456789" 
         text-char "<>+-?!_:qwertyuiopasdfghjklmzxcvbnAZERTYUIOPQSDFGHKLMWXCVBN"
@@ -11,8 +13,7 @@
                              close-sqbracket-char open-sqbracket-char
                              open-hbracket-char close-hbracket-char
                              space-char)
-        text-number-char (str text-char number-char)]
-        
+        text-number-char (str text-char number-char)]        
     (loop [cur-state :init char-count 0 startword-char-count 0 previous "" rem-text text acc []]
       (let [cur-char (str (first rem-text))]
       (if (empty? rem-text)
@@ -71,7 +72,7 @@
       (recur (concat lexies (add-line (first full-text) line-number )) (rest remaining-text) (+ line-number 1)))))
 
 
-
+;;;;;;;;;;;;;;;;;;;;;;;parsing;;;;;;;;;;;;;;;;;;;;;;
 (defn parse-by-parentheses [lexed access-index] 
   (if (<= (count lexed)  access-index)
     {:use 0 :size 0 :lex nil :type :parse-error :subtype :empty :text "unvalid parse call on empty lex data" :is-leaf true}
@@ -129,23 +130,44 @@
                         :r-hbracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par6 :is-leaf false}
                          (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
 (defn parse-it [lexed] (parse-by-parentheses lexed 0))
-(defn build-identifier-navigation-rec [current-count remainder]
+(defn build-identifier-navigation-rec [current-count remainder parent-id]
   (if (:is-leaf remainder)
-    {:next-count (inc current-count) :annotated (assoc remainder :id current-count)}
+    {:next-count (inc current-count) :annotated (assoc remainder :id current-count :parent-id parent-id)}
     (let [[new-count updated-mid]
           (loop [sub-current-count (inc current-count) remaining (:mid remainder) acc []]
             (if (empty? remaining)
               [sub-current-count acc]
-              (let [sub-nav (build-identifier-navigation-rec sub-current-count (first remaining))
+              (let [sub-nav (build-identifier-navigation-rec sub-current-count (first remaining) current-count)
                     updated-count (:next-count sub-nav)
                     updated-sub-nav (:annotated  sub-nav)]
                 (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
-      {:next-count new-count :annotated (assoc (assoc remainder :mid updated-mid) :id current-count)})))
-(defn build-identifier-navigation [ast] (:annotated (build-identifier-navigation-rec 0 ast)))
+      {:next-count new-count :annotated (assoc (assoc remainder :mid updated-mid) :id current-count :parent-id parent-id)})))
+(defn build-identifier-navigation [ast] (:annotated (build-identifier-navigation-rec 1 ast 0)))
+
+
+
+;;;;;;;;;;;;;;Symbol table;;;;;;;;;;;;
+(defn build-symbol-table 
+  [namespace-id define-type-id s-let-id AST current-symbol-table-id acc] 
+  (let [is-namespace? (fn [AST] (throw (Exception. "notimplemented")))
+        is-let? (fn [AST] (throw (Exception. "notimplemented")))
+        is-function? (fn [AST] (throw (Exception. "notimplemented")))
+        namespace-table (fn [AST] (throw (Exception. "notimplemented")))
+        let-table (fn [AST] (throw (Exception. "notimplemented")))
+        function-table (fn [AST] (throw (Exception. "notimplemented")))
+        merge-children (fn [AST acc] (throw (Exception. "notimplemented")))] 
+  (if (AST :is-leaf) 
+    (assoc acc (AST :id) current-symbol-table-id)
+    (cond 
+      (= (AST :type) :bracket) (merge-children AST acc)
+      (= (AST :type) :hbracket) (merge-children AST acc)
+      (is-namespace? AST) (merge-children AST (assoc acc (AST :id) (namespace-table AST))) 
+      (is-let? AST)  (merge-children AST (assoc acc (AST :id) (let-table AST)))
+      (is-function? AST)  (merge-children AST (assoc acc (AST :id) (function-table AST)))
+      (throw (Exception. "Unexpected symbol"))))))
 
 (defn remove-spaces [remainder] 
-  (if (remainder :is-leaf) 
-    remainder 
-    (assoc remainder :mid (filter #(not= (% :type) :space) (remainder :mid )) )))
-(def ided (build-identifier-navigation (parse-it (lex-it ["(3.15 3.16)"]) )))
+  (if (remainder :is-leaf) remainder 
+    (assoc remainder :mid (filter #(not= (% :type) :space) (remainder :mid)))))
+(def ided (build-identifier-navigation (parse-it (lex-it ["(3.15 3.16)"]))))
 ;;(def spaces-removed (remove-spaces ided))
