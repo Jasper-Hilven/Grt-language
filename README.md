@@ -1,10 +1,6 @@
 # grt
 
-A language exercise
-
-## Usage
-
-Training clojure by building a lexer and parser
+A program language of which the properties are not yet totally defined.
 
 ## License
 
