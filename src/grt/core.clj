@@ -94,53 +94,55 @@
                              (case type
                                :parse-error
                                (case (:subtype part-of-the-cake)
-                                 :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf :false}
+                                 :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf false}
                                  (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))
-                               :r-parenthesis {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parenthesis :is-leaf :false}
-                               :r-hbracket {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par1 :is-leaf :false}
-                               :r-bracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par2 :is-leaf :false}
+                               :r-parenthesis {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parenthesis :is-leaf false}
+                               :r-hbracket {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par1 :is-leaf false}
+                               :r-bracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par2 :is-leaf false}
                                (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))
           ;[part-of-the-cake type] [:undetected part-of-the-cake type]) ))
-        :l-hbracket (loop [current-lexed (inc access-index) acc [] own-use 1]
-                            (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
-                                  type (:type part-of-the-cake)
-                                  usage (:use part-of-the-cake)]
-                              (case type
-                                :parse-error
-                                (case (:subtype part-of-the-cake)
-                                  :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf :false}
-                                  (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))
-                                :r-hbracket {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :hbracket :is-leaf :false}
-                                :r-parenthesis {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par3 :is-leaf :false}
-                                :r-bracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par4 :is-leaf :false}
-                                 (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))
+        :l-hbracket 
+        (loop [current-lexed (inc access-index) acc [] own-use 1]
+          (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
+                type (:type part-of-the-cake)
+                usage (:use part-of-the-cake)]
+            (case type
+              :parse-error
+              (case (:subtype part-of-the-cake)
+                :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf false}
+                (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))
+              :r-hbracket {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :hbracket :is-leaf false}
+              :r-parenthesis {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par3 :is-leaf false}
+              :r-bracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par4 :is-leaf false}
+                 (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))
         :l-bracket (loop [current-lexed (inc access-index) acc [] own-use 1]
-                            (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
-                                  type (:type part-of-the-cake)
-                                  usage (:use part-of-the-cake)]
-                              (case type
-                                :parse-error
-                                (case (:subtype part-of-the-cake)
-                                  :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf :false}
-                                  (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage))) 
-                                :r-bracket {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :bracket :is-leaf :false}
-                                :r-parenthesis {:use (inc own-use) :size 1 :curlex current-lexed :pcake part-of-the-cake :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par5 :is-leaf :false}
-                                :r-hbracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par6 :is-leaf :false}
-                                 (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
+                    (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
+                          type (:type part-of-the-cake)
+                          usage (:use part-of-the-cake)]
+                      (case type
+                        :parse-error
+                        (case (:subtype part-of-the-cake)
+                          :empty {:use own-use :size 1 :l-par toHandle :r-par nil :mid acc :type :parse-error :subtype :unclosed-par :is-leaf false}
+                          (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage))) 
+                        :r-bracket {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :bracket :is-leaf false}
+                        :r-parenthesis {:use (inc own-use) :size 1 :curlex current-lexed :pcake part-of-the-cake :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par5 :is-leaf false}
+                        :r-hbracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par6 :is-leaf false}
+                         (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
 
 
 (defn build-identifier-navigation [current-count remainder]
   (if (:is-leaf remainder)
     {:next-count (inc current-count) :annotated (assoc remainder :id current-count)}
-               (let [[new-count updated-mid]
-                              (loop [sub-current-count (inc current-count) remaining (:mid remainder) acc []]
-                                             (if (empty? remaining)
-                                                            [sub-current-count acc]
-                                                            (let [sub-nav (build-identifier-navigation sub-current-count (first remaining) )
-                                                                             updated-count (:next-count sub-nav)
-                                                                             updated-sub-nav (:annotated sub-nav)]
-                                                                           (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
-                   {:next-count new-count :annotated (assoc remainder :mid updated-mid :id current-count)})))
+    (let [[new-count updated-mid]
+          (loop [sub-current-count (inc current-count) remaining (:mid remainder) acc []]
+            (if (empty? remaining)
+              [sub-current-count acc]
+              (let [sub-nav (build-identifier-navigation sub-current-count (first remaining))
+                    updated-count (:next-count sub-nav)
+                    updated-sub-nav (:annotated  sub-nav)]
+                (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
+      {:next-count new-count :annotated (assoc (assoc remainder :mid updated-mid) :id current-count)})))
+
 
 
 (comment 
