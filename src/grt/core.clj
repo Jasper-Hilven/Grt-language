@@ -128,22 +128,24 @@
                         :r-parenthesis {:use (inc own-use) :size 1 :curlex current-lexed :pcake part-of-the-cake :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par5 :is-leaf false}
                         :r-hbracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par6 :is-leaf false}
                          (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
-
-
-(defn build-identifier-navigation [current-count remainder]
+(defn parse-it [lexed] (parse-by-parentheses lexed 0))
+(defn build-identifier-navigation-rec [current-count remainder]
   (if (:is-leaf remainder)
     {:next-count (inc current-count) :annotated (assoc remainder :id current-count)}
     (let [[new-count updated-mid]
           (loop [sub-current-count (inc current-count) remaining (:mid remainder) acc []]
             (if (empty? remaining)
               [sub-current-count acc]
-              (let [sub-nav (build-identifier-navigation sub-current-count (first remaining))
+              (let [sub-nav (build-identifier-navigation-rec sub-current-count (first remaining))
                     updated-count (:next-count sub-nav)
                     updated-sub-nav (:annotated  sub-nav)]
                 (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
       {:next-count new-count :annotated (assoc (assoc remainder :mid updated-mid) :id current-count)})))
+(defn build-identifier-navigation [ast] (:annotated (build-identifier-navigation-rec 0 ast)))
 
-
-
-(comment 
-         (is  (add-line "(" 0) [{:type :l-bracket, :text "(", :char-pos 0, :l-number 0}]))
+(defn remove-spaces [remainder] 
+  (if (remainder :is-leaf) 
+    remainder 
+    (assoc remainder :mid (filter #(not= (% :type) :space) (remainder :mid )) )))
+(def ided (build-identifier-navigation (parse-it (lex-it ["(3.15 3.16)"]) )))
+;;(def spaces-removed (remove-spaces ided))
