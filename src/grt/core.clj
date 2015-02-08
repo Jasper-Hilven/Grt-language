@@ -1,6 +1,4 @@
 (ns grt.core)
-
-
 ;;;;;;;;;;;;;lexing;;;;;;;;;;;;
 (defn add-line [text l-number]
   (let [number-char "0123456789" 
@@ -147,27 +145,54 @@
 
 
 ;;;;;;;;;;;;;;Symbol table;;;;;;;;;;;;
+
+(defn first-containing [AST] (and (= (AST :type) :parenthesis)
+                                        (not-empty (AST :mid))
+                                        (= :id ((first (AST :mid)) :type))
+                                        (first (AST :mid))))
+(defn is-namespace? [AST namespace-id] 
+  (= (AST :type) 
+     (let [ qualifier (first-containing AST)] 
+       (and 
+         qualifier 
+         (= namespace-id (qualifier :text))
+         (>= (count (AST :mid)) 2)
+         (= (((AST :mid) 1) :type) :id)))))
+
+(defn is-let? [AST s-let-id] 
+  (= (AST :type) 
+     (let [qualifier (first-containing AST)] 
+       (and qualifier 
+            (= s-let-id (qualifier :text))
+            (= (count (AST :mid)) 3)
+            (= (((AST :mid) 1) :type) :bracket)))))
+
+(defn is-function? [AST function-id] 
+  (= (AST :type) 
+     (let [ qualifier (first-containing AST)] 
+       (and qualifier 
+            (= function-id (qualifier :text))
+            (= (count (AST :mid)) 4)
+            (= (((AST :mid) 2) :type) :bracket)))))
+
 (defn build-symbol-table 
   [namespace-id define-type-id s-let-id AST current-symbol-table-id acc] 
-  (let [is-namespace? (fn [AST] (throw (Exception. "notimplemented")))
-        is-let? (fn [AST] (throw (Exception. "notimplemented")))
-        is-function? (fn [AST] (throw (Exception. "notimplemented")))
-        namespace-table (fn [AST] (throw (Exception. "notimplemented")))
+  (let [namespace-table (fn [AST] (throw (Exception. "notimplemented")))
         let-table (fn [AST] (throw (Exception. "notimplemented")))
         function-table (fn [AST] (throw (Exception. "notimplemented")))
         merge-children (fn [AST acc] (throw (Exception. "notimplemented")))] 
   (if (AST :is-leaf) 
     (assoc acc (AST :id) current-symbol-table-id)
-    (cond 
+    (cond
       (= (AST :type) :bracket) (merge-children AST acc)
       (= (AST :type) :hbracket) (merge-children AST acc)
       (is-namespace? AST) (merge-children AST (assoc acc (AST :id) (namespace-table AST))) 
       (is-let? AST)  (merge-children AST (assoc acc (AST :id) (let-table AST)))
       (is-function? AST)  (merge-children AST (assoc acc (AST :id) (function-table AST)))
-      (throw (Exception. "Unexpected symbol"))))))
+      :else (throw (Exception. "Unexpected symbol"))))))
 
 (defn remove-spaces [remainder] 
   (if (remainder :is-leaf) remainder 
     (assoc remainder :mid (filter #(not= (% :type) :space) (remainder :mid)))))
+
 (def ided (build-identifier-navigation (parse-it (lex-it ["(3.15 3.16)"]))))
-;;(def spaces-removed (remove-spaces ided))
