@@ -1,5 +1,5 @@
-;;;;;;;;;;;;;;;;;;;;;;;parsing;;;;;;;;;;;;;;;;;;;;;;
-(ns grt.parser)
+(ns grt.parser.hierarchybuilder)
+;;;;;;;;;;;Hierarchy building;;;;;;;;;;;;;;;
 (defn parse-by-parentheses [lexed access-index] 
   (if (<= (count lexed)  access-index)
     {:use 0 :size 0 :lex nil :type :parse-error :subtype :empty :text "unvalid parse call on empty lex data" :is-leaf true}
@@ -69,52 +69,4 @@
                     updated-sub-nav (:annotated  sub-nav)]
                 (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
       {:next-count new-count :annotated (assoc (assoc remainder :mid updated-mid) :id current-count :parent-id parent-id)})))
-
-
-
-(defn first-containing [AST] (and (= (AST :type) :parenthesis)
-                                        (not-empty (AST :mid))
-                                        (= :id ((first (AST :mid)) :type))
-                                        (first (AST :mid))))
-
-
-(defn is-let? [ST s-let-id] 
-  (= (ST :type) 
-     (let [qualifier (first-containing ST)] 
-       (and qualifier 
-            (= s-let-id (qualifier :text))
-            (= (count (ST :mid)) 3)
-            (= (((ST :mid) 1) :type) :bracket)))))
-
-(defn is-function? [ST function-id] 
-  (= (ST :type) 
-     (let [ qualifier (first-containing ST)] 
-       (and qualifier 
-            (= function-id (qualifier :text))
-            (= (count (ST :mid)) 4)
-            (= (((ST :mid) 2) :type) :bracket)))))
-
-(defn remove-spaces [remainder] 
-  (if (remainder :is-leaf) remainder 
-    (assoc remainder :mid (filter #(not= (% :type) :space) (remainder :mid)))))
-
-
-(defn handle-children [] nil)
-(defn parse-functions [AST] AST)
-(defn parse-lets [AST] AST)
-(defn parse-function-evaluation [AST] AST)
-(defn parse-arrays [AST] AST)
-(defn parse-dictionary-likes [AST] AST)
-(defn parse-r-values [AST] AST)
-
-
-(defn parse-it [lexed] 
-  (let [parentheses-parsed    (parse-by-parentheses lexed 0)
-        parentheses-lets      (parse-lets parentheses-parsed)
-        parentheses-functions (parse-functions parentheses-lets)
-        function-evaluation   (parse-function-evaluation parentheses-functions)
-        arrays                (parse-arrays function-evaluation)
-        dictionary-likes      (parse-dictionary-likes arrays)
-        r-values              (parse-r-values dictionary-likes)] 
-    r-values))
 
