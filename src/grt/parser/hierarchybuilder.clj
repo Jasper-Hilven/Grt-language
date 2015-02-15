@@ -1,6 +1,6 @@
 (ns grt.parser.hierarchybuilder)
 ;;;;;;;;;;;Hierarchy building;;;;;;;;;;;;;;;
-(defn parse-by-parentheses [lexed access-index] 
+(defn parse-by-parentheses-rec [lexed access-index] 
   (if (<= (count lexed)  access-index)
     {:use 0 :size 0 :lex nil :type :parse-error :subtype :empty :text "unvalid parse call on empty lex data" :is-leaf true}
       (let [toHandle (nth lexed access-index)
@@ -11,12 +11,12 @@
           :id            {:use 1 :size 1 :lex toHandle :is-leaf true :type :id}
           :char          {:use 1 :size 1 :lex toHandle :is-leaf true :type :char}
           :space         {:use 1 :size 0 :lex toHandle :is-leaf true :type :space}
-          :error         {:use 1 :size 1 :lex toHandle :is-leaf true :type :lex-error}
+          :error         {:use 1 :size 1 :lex toHandle :is-leaf true :type :parse-error :subtype :lex-error}
           :r-parenthesis {:use 1 :size 1 :lex toHandle :is-leaf true :type :r-parenthesis}
           :r-hbracket    {:use 1 :size 1 :lex toHandle :is-leaf true :type :r-hbracket}
           :r-bracket     {:use 1 :size 1 :lex toHandle :is-leaf true :type :r-bracket}
           :l-parenthesis (loop [current-lexed (inc access-index) acc [] own-use 1]
-                           (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
+                           (let [part-of-the-cake (parse-by-parentheses-rec lexed current-lexed)
                                  type (:type part-of-the-cake)
                                  usage (:use part-of-the-cake)]
                              (case type
@@ -31,7 +31,7 @@
           ;[part-of-the-cake type] [:undetected part-of-the-cake type]) ))
         :l-hbracket 
         (loop [current-lexed (inc access-index) acc [] own-use 1]
-          (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
+          (let [part-of-the-cake (parse-by-parentheses-rec lexed current-lexed)
                 type (:type part-of-the-cake)
                 usage (:use part-of-the-cake)]
             (case type
@@ -44,7 +44,7 @@
               :r-bracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par4 :is-leaf false}
                  (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))
         :l-bracket (loop [current-lexed (inc access-index) acc [] own-use 1]
-                    (let [part-of-the-cake (parse-by-parentheses lexed current-lexed)
+                    (let [part-of-the-cake (parse-by-parentheses-rec lexed current-lexed)
                           type (:type part-of-the-cake)
                           usage (:use part-of-the-cake)]
                       (case type
@@ -56,6 +56,7 @@
                         :r-parenthesis {:use (inc own-use) :size 1 :curlex current-lexed :pcake part-of-the-cake :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par5 :is-leaf false}
                         :r-hbracket  {:use (inc own-use) :size 1 :l-par toHandle :r-par (:lex part-of-the-cake) :mid acc :type :parse-error :subtype :wrongly-closed-par6 :is-leaf false}
                          (recur (+ current-lexed usage) (conj acc part-of-the-cake) (+ own-use usage)))))))))
+(defn parse-by-parentheses [lexed] (parse-by-parentheses-rec lexed 0)) 
 
 (defn build-identifier-navigation-rec [current-count remainder parent-id]
   (if (:is-leaf remainder)
@@ -70,3 +71,4 @@
                 (recur updated-count (rest remaining) (into acc [updated-sub-nav])))))]
       {:next-count new-count :annotated (assoc (assoc remainder :mid updated-mid) :id current-count :parent-id parent-id)})))
 
+(defn build-identifier-navigation [ast] (:annotated (build-identifier-navigation-rec 1 ast 0)))
