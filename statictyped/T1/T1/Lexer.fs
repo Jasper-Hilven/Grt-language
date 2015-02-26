@@ -2,33 +2,21 @@
   
   //ID
   type TLID = {ID : int}
-  type TLexFloatID =  
-  | ID of TLID
-  type TLexIntID =  
-  | ID of TLID
-  type TLexCharID =  
-  | ID of TLID
-  type TLexStringID =  
-  | ID of TLID
-  type TLexLetID =
-  | ID of TLID
-  type TLexFnID =
-  | ID of TLID
-  type TLexRefID = 
-  | ID of TLID
-  type TLexLParenthesisID = 
-  | ID of TLID
-  type TLexRParenthesisID = 
-  | ID of TLID
-  type TLexLBracketID = 
-  | ID of TLID
-  type TLexRBracketID = 
-  | ID of TLID
-  type TLexLCBracketID = 
-  | ID of TLID
-  type TLexRCBracketID = 
-  | ID of TLID
-  type TLexLParenthesisLikeID = 
+  type TLexFloatID =  | ID of TLID
+  type TLexIntID =    | ID of TLID
+  type TLexCharID =   | ID of TLID
+  type TLexStringID = | ID of TLID
+  type TLexLetID =    | ID of TLID
+  type TLexFnID =     | ID of TLID
+  type TLexRefID =    | ID of TLID
+  type TLexLParenthesisID = | ID of TLID
+  type TLexRParenthesisID = | ID of TLID
+  type TLexLBracketID =     | ID of TLID
+  type TLexRBracketID =     | ID of TLID
+  type TLexLCBracketID =    | ID of TLID
+  type TLexRCBracketID =    | ID of TLID
+  
+  type TLexLParenthesisLikeID =  
   | Parenthesis of TLexLParenthesisID
   | Bracket of TLexLBracketID
   | CBracket of TLexLCBracketID
