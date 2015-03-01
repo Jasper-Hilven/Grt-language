@@ -88,9 +88,7 @@
                         | Parenthesis(id,flist,rbr) ->appendAndContinue(TParenthesisHierarchy.Parenthesis(id,flist,rbr),lexed,count)
                         | Error lerror  ->
                           match lerror with
-                          | NotEndingParenthesisLike(lid, elist)         -> FailLBNotEndingParenthesisLike(TParenthesisHierarchy.Error(NotEndingParenthesisLike(lid, elist))::[],count)                         
+                          | NotEndingParenthesisLike(lid, elist)         -> FailLBNotEndingParenthesisLike(TParenthesisHierarchy.Error(NotEndingParenthesisLike(lid, elist))::[],count)
                           | EndOfParsing                                 -> FailLBNotEndingParenthesisLike([],count)
                           | WrongEndingParenthesisLike (l,m,r)           -> appendAndContinue(Error(WrongEndingParenthesisLike(l,m,r)),lexed,count)
-                          | UnexpectedParenthesisLike(tlexparid)         -> Succes([],tlexparid,count) 
-     
-  
+                          | UnexpectedParenthesisLike(tlexparid)         -> Succes([],tlexparid,count)

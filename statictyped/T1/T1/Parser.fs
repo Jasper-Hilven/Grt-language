@@ -10,20 +10,52 @@
     | TParenthesisError.WrongEndingParenthesisLike(left,plist,right)  -> TParseError.WrongEndingParenthesisLike(left ,right)
     | TParenthesisError.EndOfParsing                                  -> TParseError.EndOfParsingUnexpected
     | TParenthesisError.UnexpectedParenthesisLike unexpected          -> TParseError.UnexpectedParenthesisLike(unexpected)
-      
+  type TLetArgumentValidation  = 
+  | ValidLetArgument of list<TParsRefereeSValue * TStringParseSymbolValue>
+  | UnEvenNumberOfArguments
+  | ArgumentNotID of TStringParseSymbolValue
+  
   let rec parseBuiltHierarchy(hierarchy : TParenthesisHierarchy) : TStringParseSymbolValue = 
-    let validateLet(lexLetId,elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)
+    
+    let validateLet(lexLetId: TLexLetID,elements : (TParenthesisHierarchy list)) : TStringParseSymbolValue = 
+      let rec validateLetArguments(letArguments : (TStringParseSymbolValue list)) : TLetArgumentValidation = 
+        match letArguments with 
+        | first::second::rest -> 
+          match first with 
+          | TStringParseSymbolValue.Reference rVal -> 
+            match rVal with 
+            | TParsReferenceValue.LexID lID -> 
+              match validateLetArguments(rest) with
+              | ValidLetArgument currentValid -> ValidLetArgument((TParsRefereeSValue.LexID(lID),second)::currentValid)
+              | UnEvenNumberOfArguments -> UnEvenNumberOfArguments
+              | ArgumentNotID nonid ->  ArgumentNotID nonid 
+          | _ -> ArgumentNotID first
+        | first::rest -> UnEvenNumberOfArguments
+        | _ -> ValidLetArgument []
+      if(elements.Length <> 2) then Error(LetWrongAmountOfArguments(TParsLetValue.LexID(lexLetId)))
+      else 
+      let firstElement = parseBuiltHierarchy(elements.Head)
+      let secondElement = parseBuiltHierarchy(elements.Tail.Head)
+      match firstElement with
+      | Array letElements -> 
+        match validateLetArguments(letElements) with  
+        | ValidLetArgument validTupels -> TStringParseSymbolValue.Let(TParsLetValue.LexID lexLetId,validTupels,secondElement)
+        | UnEvenNumberOfArguments -> TStringParseSymbolValue.Error(LetWrongAmountOfArguments(TParsLetValue.LexID lexLetId))
+        | ArgumentNotID nonId -> TStringParseSymbolValue.Error(LetArgumentNoId(nonId))
+      | _ -> Error(LetFirstArgumentNotValidArray(TParsLetValue.LexID(lexLetId)))
+    
     let validateFunction(lexFnId,elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)  
     let validateFunctionCall(elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)  
     let validateArray(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)
     let validateAssociative(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)
+    
     match hierarchy with
     | TParenthesisHierarchy.Parenthesis(lbracket,elemList,rBracket) -> 
       match elemList with
       | [] -> Error(EmptyFunctionCall)
       | firstElem::restElems ->
         match firstElem with  
-        | TParenthesisHierarchy.Let lexLetId-> validateLet(lexLetId,restElems)   
+        | TParenthesisHierarchy.Let lexLetId-> validateLet(lexLetId ,restElems)   
         | TParenthesisHierarchy.Fn lexFnId -> validateFunction(lexFnId,restElems)
         | _ -> validateFunctionCall(elemList) 
     | TParenthesisHierarchy.Brackets(lbracket,elemList,rBracket) -> validateArray(elemList)

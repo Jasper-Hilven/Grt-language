@@ -49,12 +49,12 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tutorial.fsx" />
     <Compile Include="CharDefinitions.fs" />
     <Compile Include="LexValues.fs" />
     <Compile Include="Lexer.fs" />
     <Compile Include="LexDefinitions.fs" />
     <Compile Include="ParserValues.fs" />
+    <Compile Include="ParserHierarchyBuilder.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="ParserDefinitions.fs" />
     <Compile Include="SymbolLinker.fs" />

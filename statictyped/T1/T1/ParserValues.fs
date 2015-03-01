@@ -11,15 +11,17 @@ open LexDefinitions
   type TParsFunctionValue =  | LexID of TLexFnID
   type TParseError = 
   | EmptyFunctionCall
-  | Bracket
   | NakedFunctionIdentifier of TLexFnID
   | NakedLetIdentifier of TLexLetID
   | NotEndingParenthesesLike of TLexLParenthesisLikeID 
   | WrongEndingParenthesisLike of TLexLParenthesisLikeID * TLexRParenthesisLikeID
   | EndOfParsingUnexpected
   | UnexpectedParenthesisLike of TLexRParenthesisLikeID
-  type TStringParseSymbolValue =
-  | Let of TParsLetValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue //
+  | LetWrongAmountOfArguments of TParsLetValue
+  | LetFirstArgumentNotValidArray of TParsLetValue
+  | LetArgumentNoId of TStringParseSymbolValue
+  and TStringParseSymbolValue =
+  | Let of TParsLetValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue
   | FN of TParsFunctionValue * TParsRefereeSValue * list<TParsRefereeSValue> * TStringParseSymbolValue
   | FNCall of TParsReferenceValue * list<TStringParseSymbolValue>
   | Float of TParsFloatValue
@@ -29,5 +31,5 @@ open LexDefinitions
   | Reference of TParsReferenceValue
   | Referee of TParsRefereeSValue
   | Error of TParseError
-  | Array of List<TStringParseSymbolValue> 
-  
+  | Array of list<TStringParseSymbolValue> 
+  | Associative of list<TStringParseSymbolValue*TStringParseSymbolValue>
