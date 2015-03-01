@@ -25,5 +25,4 @@
   | BadIDEnding
   | BadIntEnding
 
-
-  type PositionedTLexValue = { lineNumber : int; charPosition:  int; lexValue : TLexValue}
+  type TPositionedLexValue = { lineNumber : int; charPosition:  int; lexValue : TLexValue}

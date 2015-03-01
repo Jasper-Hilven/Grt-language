@@ -7,8 +7,8 @@
   
   let rec lex(text: string, currentLineNumber: int, currentState : TParseState, 
               currentIndex :int, currentTextValue : string,
-              startingIndex :int, acc : (PositionedTLexValue list)) 
-          : (PositionedTLexValue list) = 
+              startingIndex :int, acc : (TPositionedLexValue list)) 
+          : (TPositionedLexValue list) = 
     if(text.Length < currentIndex) 
     then
       let currentCharString = text.Chars(currentIndex).ToString()
