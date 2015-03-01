@@ -1,14 +1,14 @@
 ﻿
 module SymbolLinker
-  open Parser
+  open ParserDefinitions
 //After the symbol linking
   type TLinkedParseSymbolValue = 
-  | Let of List<Parser.TReferringID * Parser.TValuableID > * Parser.TValuableID //
-  | FN of Parser.TRefereeID * list<Parser.TRefereeID> * Parser.TValuableID
-  | FNCall of Parser.TReferringID * List<Parser.TParseSymbolID>
-  | Float of Parser.TFloatID
-  | Int of Parser.TIntID
-  | Char of Parser.TCharID
-  | String of Parser.TStringID
-  | Reference of Parser.TReferringID * Parser.TRefereeID
-  | Referee of Parser.TRefereeID
+  | Let of List<TReferringID * TValuableID > * TValuableID //
+  | FN of TRefereeID * list<TRefereeID> * TValuableID
+  | FNCall of TReferringID * List<TParseSymbolID>
+  | Float of TFloatID
+  | Int of TIntID
+  | Char of TCharID
+  | String of TStringID
+  | Reference of TReferringID * TRefereeID
+  | Referee of TRefereeID

@@ -1,48 +1,8 @@
 ﻿module Parser
   open System.Collections.Generic
-  open Lexer   
-  //IDs
-  type PID = {id : int}
+  open LexDefinitions
 
-  type TReferringID =  | ID of PID
-  type TRestID =       | ID of PID
-  type TRefereeID =    | ID of PID
-  type TFloatID =      | ID of PID
-  type TIntID =        | ID of PID
-  type TCharID  =      | ID of PID
-  type TStringID =     | ID of PID
-  type TValuableID =   | RestID of TRestID
-                       | RefereeID of TRefereeID
-
-  type TParseSymbolID =  | ReferringID of TReferringID
-                         | RefereeID of TRefereeID
-                         | RestID of TRestID
-  //Values
-  type TParsCharValue =      | LexID of Lexer.TLexCharID
-  type TParsError =          | EndOfFileError
-  type TParsFloatValue =     | LexID of Lexer.TLexFloatID
-  type TParsIntValue =       | LexID of Lexer.TLexIntID
-  type TParsRefereeSValue =  | LexID of Lexer.TLexID
-  type TParsRefereeLValue =  | RefereeID of TRefereeID
-  type TParsRefereeValue =   | StringValue of TParsRefereeSValue
-                             | LinkedValue of TParsRefereeLValue
-  type TParsReferenceValue = | LexID of Lexer.TLexID
-  type TParsStringValue =    | LexID of Lexer.TLexStringID
-  type TParsLetValue =       | LexID of Lexer.TLexLetID
-
-//After parsing, before symbol linking
-  type TStringParseSymbolValue =
-  | Let of list<TRefereeID * TValuableID > * TValuableID //
-  | FN of TRefereeID * list<TRefereeID> * TValuableID
-  | FNCall of TReferringID * list<TParseSymbolID>
-  | Float of TParsFloatValue
-  | Int of TParsIntValue
-  | Char of TParsCharValue
-  | String of TParsStringValue
-  | Reference of TParsReferenceValue
-  | Referee of TParsRefereeSValue
-  | Error of TParsError
-  //After hierarchy building, before final parse
+  //Intermediate representation: After hierarchy building, before final parse
   type TParenthesisHierarchy = 
   | Float of TLexFloatID
   | Int of TLexIntID
@@ -67,44 +27,46 @@
   type TBHierarchy = 
   | TPC of TParenthesisHierarchy * int
 
-  let rec BuildHierarchy(lexed : List<Lexer.TLexID>, count : int) : TBHierarchy =
+  //let rec parseHierarchy(hierarchy : TBHierarchy) : TStringParseSymbolValue = 0
+  
+  let rec BuildHierarchy(lexed : List<TLexID>, count : int) : TBHierarchy =
     let countinc = count + 1
     if(count >= lexed.Count) then  TPC(Error(EndOfParsing),countinc)
     else
     let curSymbol = lexed.Item(count)
     match curSymbol with
-    | Lexer.TLexID.Char schar       ->  TPC(TParenthesisHierarchy.Char(schar),countinc)
-    | Lexer.TLexID.Float sfloat     ->  TPC(TParenthesisHierarchy.Float sfloat,countinc)
-    | Lexer.TLexID.Int sint         ->  TPC(TParenthesisHierarchy.Int sint,countinc)
-    | Lexer.TLexID.String sstring   ->  TPC(TParenthesisHierarchy.String sstring,countinc)
-    | Lexer.TLexID.Let  slet        ->  TPC(TParenthesisHierarchy.Let slet ,countinc)
-    | Lexer.TLexID.Fn  sfn          ->  TPC(TParenthesisHierarchy.Fn sfn ,countinc)
-    | Lexer.TLexID.Ref  sref        ->  TPC(TParenthesisHierarchy.Ref sref,countinc)
-    | Lexer.TLexID.RBracket     srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.Bracket(srb))),countinc)
-    | Lexer.TLexID.RParenthesis srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.Parenthesis(srb))),countinc)
-    | Lexer.TLexID.RCBracket    srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.CBracket(srb))),countinc)
-    | Lexer.TLexID.LParenthesis sbrid ->  
+    | TLexID.Char schar       ->  TPC(TParenthesisHierarchy.Char(schar),countinc)
+    | TLexID.Float sfloat     ->  TPC(TParenthesisHierarchy.Float sfloat,countinc)
+    | TLexID.Int sint         ->  TPC(TParenthesisHierarchy.Int sint,countinc)
+    | TLexID.String sstring   ->  TPC(TParenthesisHierarchy.String sstring,countinc)
+    | TLexID.Let  slet        ->  TPC(TParenthesisHierarchy.Let slet ,countinc)
+    | TLexID.Fn  sfn          ->  TPC(TParenthesisHierarchy.Fn sfn ,countinc)
+    | TLexID.Ref  sref        ->  TPC(TParenthesisHierarchy.Ref sref,countinc)
+    | TLexID.RBracket     srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.Bracket(srb))),countinc)
+    | TLexID.RParenthesis srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.Parenthesis(srb))),countinc)
+    | TLexID.RCBracket    srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.CBracket(srb))),countinc)
+    | TLexID.LParenthesis sbrid ->  
       match ListBuilder(lexed, count + 1) with 
       | Succes (tlist, endpar,nc) -> match endpar with
                                      | TLexRParenthesisLikeID.Parenthesis p-> TPC(TParenthesisHierarchy.Parenthesis(sbrid,tlist,p),nc)
                                      | TLexRParenthesisLikeID.Bracket     b-> TPC(TParenthesisHierarchy.Error(WrongEndingParenthesisLike(TLexLParenthesisLikeID.Parenthesis(sbrid), tlist, TLexRParenthesisLikeID.Bracket(b))),nc)
                                      | TLexRParenthesisLikeID.CBracket    b-> TPC(TParenthesisHierarchy.Error(WrongEndingParenthesisLike(TLexLParenthesisLikeID.Parenthesis(sbrid), tlist, TLexRParenthesisLikeID.CBracket(b))),nc)
       | FailLBNotEndingParenthesisLike (list,nc) -> TPC(Error(TParenthesisError.NotEndingParenthesisLike( TLexLParenthesisLikeID.Parenthesis(sbrid), list)),nc)
-    | Lexer.TLexID.LBracket sbrid ->  
+    | TLexID.LBracket sbrid ->  
       match ListBuilder(lexed, count + 1) with 
       | Succes (list, endpar,nc) -> match endpar with
                                     | TLexRParenthesisLikeID.Parenthesis p-> TPC(TParenthesisHierarchy.Error(WrongEndingParenthesisLike(TLexLParenthesisLikeID.Bracket(sbrid), list, TLexRParenthesisLikeID.Parenthesis(p))),nc)
                                     | TLexRParenthesisLikeID.Bracket     b-> TPC(TParenthesisHierarchy.Brackets(sbrid, list, b),nc)
                                     | TLexRParenthesisLikeID.CBracket    b-> TPC(TParenthesisHierarchy.Error(WrongEndingParenthesisLike(TLexLParenthesisLikeID.Bracket(sbrid), list, TLexRParenthesisLikeID.CBracket(b))),nc)
       | FailLBNotEndingParenthesisLike (list,nc) -> TPC(Error(TParenthesisError.NotEndingParenthesisLike( TLexLParenthesisLikeID.Bracket(sbrid), list)),nc)
-    | Lexer.TLexID.LCBracket sbrid ->  
+    | TLexID.LCBracket sbrid ->  
       match ListBuilder(lexed, count + 1) with 
       | Succes (list, endpar,nc) -> match endpar with
                                     | TLexRParenthesisLikeID.Parenthesis p-> TPC(TParenthesisHierarchy.Error(WrongEndingParenthesisLike(TLexLParenthesisLikeID.CBracket(sbrid), list, TLexRParenthesisLikeID.Parenthesis(p))),nc)
                                     | TLexRParenthesisLikeID.Bracket     b-> TPC(TParenthesisHierarchy.Error(WrongEndingParenthesisLike(TLexLParenthesisLikeID.CBracket(sbrid), list, TLexRParenthesisLikeID.Bracket(b))),nc)
                                     | TLexRParenthesisLikeID.CBracket    b-> TPC(TParenthesisHierarchy.CBrackets(sbrid, list, b),nc)
       | FailLBNotEndingParenthesisLike (list,nc) -> TPC(Error(TParenthesisError.NotEndingParenthesisLike( TLexLParenthesisLikeID.CBracket(sbrid), list)),nc)
-  and ListBuilder(lexed : List<Lexer.TLexID>, ocount : int): ListBuilderResult = 
+  and ListBuilder(lexed : List<TLexID>, ocount : int): ListBuilderResult = 
     let nextRes = BuildHierarchy(lexed,ocount)
     let appendAndContinue(elem,lexed,count) =
       match ListBuilder(lexed,count + 1) with
@@ -123,8 +85,8 @@
                                            | Parenthesis(id,flist,rbr) ->appendAndContinue(TParenthesisHierarchy.Parenthesis(id,flist,rbr),lexed,count)
                                            | Error lerror  ->
                                              match lerror with
-                                             | NotEndingParenthesisLike(lid, elist)                -> FailLBNotEndingParenthesisLike(TParenthesisHierarchy.Error(NotEndingParenthesisLike(lid, elist))::[],count)                         
-                                             | EndOfParsing                                        -> FailLBNotEndingParenthesisLike([],count)
-                                             | WrongEndingParenthesisLike (l,m,r)                  -> appendAndContinue(Error(WrongEndingParenthesisLike(l,m,r)),lexed,count)
-                                             | UnexpectedParenthesisLike(tlexparid)                -> Succes([],tlexparid,count) 
-      
+                                             | NotEndingParenthesisLike(lid, elist)         -> FailLBNotEndingParenthesisLike(TParenthesisHierarchy.Error(NotEndingParenthesisLike(lid, elist))::[],count)                         
+                                             | EndOfParsing                                 -> FailLBNotEndingParenthesisLike([],count)
+                                             | WrongEndingParenthesisLike (l,m,r)           -> appendAndContinue(Error(WrongEndingParenthesisLike(l,m,r)),lexed,count)
+                                             | UnexpectedParenthesisLike(tlexparid)         -> Succes([],tlexparid,count) 
+  
