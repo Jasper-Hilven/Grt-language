@@ -46,20 +46,33 @@
     
     
     let validateFunction(lexFnId: TLexFnID,elements :(TParenthesisHierarchy list) ) : TStringParseSymbolValue = 
-      let validateParameters() : (bool* (TParsRefereeSValue))
-      if(elements.Length <> 3) then Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId))) else 
-      match elements with 
-      | name::parameters::value::[] -> 
-        let parsedParams = parseBuiltHierarchy(parameters)
-        let parsedValue = parseBuiltHierarchy(value)
-        match name with
-        | TParenthesisHierarchy.Ref ->
-          match parsedParams with
-          |  Array slist -> 
-            match
-          | _ -> Error(FunctionParamsInvalid 
-        | _ -> Error(FunctionFirstArgumentName(
-      | _ ->Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId)))
+      let rec validateParameters(params: TStringParseSymbolValue list) : (bool* (TParsRefereeSValue list))        = 
+        match params with
+        |[] -> (true,[])
+        | elem::rest -> 
+          match elem with
+          | Reference tpref -> match tpref with | TParsReferenceValue.LexID tpreflid -> 
+            match validateParameters(rest) with
+            | (true,relems) -> (true,TParsRefereeSValue.LexID(tpreflid)::relems)
+            | (false,_)     -> (false, [])
+      if(elements.Length <> 3) then Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId))) 
+      else 
+        match elements with 
+        | name::parameters::value::[] -> 
+          let parsedParams = parseBuiltHierarchy(parameters)
+          let parsedValue = parseBuiltHierarchy(value)
+          match name with
+          | TParenthesisHierarchy.Ref lexNameRefId ->
+            match parsedParams with
+            |  Array slist -> 
+              match validateParameters(slist) with
+              | (true, referees) -> TStringParseSymbolValue.FN(TParsFunctionValue.LexID lexFnId,
+                                                               TParsRefereeSValue.LexID lexNameRefId,
+                                                               referees, parsedValue)
+              | (false,referees) -> Error(FunctionInvalidParameters(TParsFunctionValue.LexID(lexFnId)))
+            | _ -> Error(FunctionParamsArrayInvalid(TParsFunctionValue.LexID(lexFnId)))
+          | _ -> Error(FunctionFirstArgumentName(TParsFunctionValue.LexID(lexFnId),parseBuiltHierarchy(name)))
+        | _ ->Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId)))
            
       
     let validateFunctionCall(elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)  

@@ -22,6 +22,8 @@ open LexDefinitions
   | LetArgumentNoId of TStringParseSymbolValue
   | FunctionWrongAmountOfArguments of TParsFunctionValue
   | FunctionFirstArgumentName of TParsFunctionValue * TStringParseSymbolValue
+  | FunctionParamsArrayInvalid of TParsFunctionValue
+  | FunctionInvalidParameters of TParsFunctionValue
   and TStringParseSymbolValue =
   | Let of TParsLetValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue
   | FN of TParsFunctionValue * TParsRefereeSValue * list<TParsRefereeSValue> * TStringParseSymbolValue
