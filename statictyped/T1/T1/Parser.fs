@@ -44,7 +44,24 @@
         | ArgumentNotID nonId -> TStringParseSymbolValue.Error(LetArgumentNoId(nonId))
       | _ -> Error(LetFirstArgumentNotValidArray(TParsLetValue.LexID(lexLetId)))
     
-    let validateFunction(lexFnId,elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)  
+    
+    let validateFunction(lexFnId: TLexFnID,elements :(TParenthesisHierarchy list) ) : TStringParseSymbolValue = 
+      let validateParameters() : (bool* (TParsRefereeSValue))
+      if(elements.Length <> 3) then Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId))) else 
+      match elements with 
+      | name::parameters::value::[] -> 
+        let parsedParams = parseBuiltHierarchy(parameters)
+        let parsedValue = parseBuiltHierarchy(value)
+        match name with
+        | TParenthesisHierarchy.Ref ->
+          match parsedParams with
+          |  Array slist -> 
+            match
+          | _ -> Error(FunctionParamsInvalid 
+        | _ -> Error(FunctionFirstArgumentName(
+      | _ ->Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId)))
+           
+      
     let validateFunctionCall(elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)  
     let validateArray(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)
     let validateAssociative(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)

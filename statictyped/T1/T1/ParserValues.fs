@@ -20,6 +20,8 @@ open LexDefinitions
   | LetWrongAmountOfArguments of TParsLetValue
   | LetFirstArgumentNotValidArray of TParsLetValue
   | LetArgumentNoId of TStringParseSymbolValue
+  | FunctionWrongAmountOfArguments of TParsFunctionValue
+  | FunctionFirstArgumentName of TParsFunctionValue * TStringParseSymbolValue
   and TStringParseSymbolValue =
   | Let of TParsLetValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue
   | FN of TParsFunctionValue * TParsRefereeSValue * list<TParsRefereeSValue> * TStringParseSymbolValue
