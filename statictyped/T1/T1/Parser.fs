@@ -14,7 +14,9 @@
   | ValidLetArgument of list<TParsRefereeSValue * TStringParseSymbolValue>
   | UnEvenNumberOfArguments
   | ArgumentNotID of TStringParseSymbolValue
-  
+  type TAssociativeArgumentValidation = 
+  | Succes of list<TStringParseSymbolValue*TStringParseSymbolValue>
+  | UnEvenNumberOfParameters
   let rec parseBuiltHierarchy(hierarchy : TParenthesisHierarchy) : TStringParseSymbolValue = 
     
     let validateLet(lexLetId: TLexLetID,elements : (TParenthesisHierarchy list)) : TStringParseSymbolValue = 
@@ -46,15 +48,18 @@
     
     
     let validateFunction(lexFnId: TLexFnID,elements :(TParenthesisHierarchy list) ) : TStringParseSymbolValue = 
-      let rec validateParameters(params: TStringParseSymbolValue list) : (bool* (TParsRefereeSValue list))        = 
-        match params with
+      let rec validateParameters(parameters: TStringParseSymbolValue list) : (bool* (TParsRefereeSValue list))        = 
+        match parameters with
         |[] -> (true,[])
         | elem::rest -> 
           match elem with
-          | Reference tpref -> match tpref with | TParsReferenceValue.LexID tpreflid -> 
-            match validateParameters(rest) with
-            | (true,relems) -> (true,TParsRefereeSValue.LexID(tpreflid)::relems)
-            | (false,_)     -> (false, [])
+          | Reference tpref -> 
+            match tpref with 
+            | TParsReferenceValue.LexID tpreflid -> 
+               match validateParameters(rest) with
+               | (true,relems) -> (true,TParsRefereeSValue.LexID(tpreflid)::relems)
+               | (false,_)     -> (false, [])
+          | noreference -> (false, []) 
       if(elements.Length <> 3) then Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId))) 
       else 
         match elements with 
@@ -79,7 +84,16 @@
       TStringParseSymbolValue.FNCall(List.map parseBuiltHierarchy elements)
     let validateArray(elemList) : TStringParseSymbolValue = 
       TStringParseSymbolValue.Array(List.map parseBuiltHierarchy elemList)
-    let validateAssociative(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)
+    let rec validateAssociative(elemList: (TParenthesisHierarchy list)) : TStringParseSymbolValue =
+      match elemList with
+      | first::second::rest -> 
+        match validateAssociative(rest) with
+        |  Error(AssociativeUnevenAmountOfParameters) -> Error(AssociativeUnevenAmountOfParameters)
+        |  Associative childlist-> Associative((parseBuiltHierarchy(first),parseBuiltHierarchy(second))::childlist)
+        | whatever -> whatever 
+      | first::rest  -> Error(AssociativeUnevenAmountOfParameters)
+      | [] -> Associative []
+      
       
     match hierarchy with
     | TParenthesisHierarchy.Parenthesis(lbracket,elemList,rBracket) -> 
