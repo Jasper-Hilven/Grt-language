@@ -3,7 +3,7 @@
   open LexDefinitions
   open ParserHierarchyBuilder     
   open ParserValues
-  
+  open System.Linq
   let castToParseError(hierarchyError : TParenthesisError) :TParseError = 
     match hierarchyError with
     | NotEndingParenthesisLike(parenthesisLike,plist) -> TParseError.NotEndingParenthesesLike parenthesisLike
@@ -75,10 +75,12 @@
         | _ ->Error(FunctionWrongAmountOfArguments(TParsFunctionValue.LexID(lexFnId)))
            
       
-    let validateFunctionCall(elements) : TStringParseSymbolValue = Error(EmptyFunctionCall)  
-    let validateArray(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)
+    let validateFunctionCall(elements : (TParenthesisHierarchy list)) : TStringParseSymbolValue = 
+      TStringParseSymbolValue.FNCall(List.map parseBuiltHierarchy elements)
+    let validateArray(elemList) : TStringParseSymbolValue = 
+      TStringParseSymbolValue.Array(List.map parseBuiltHierarchy elemList)
     let validateAssociative(elemList) : TStringParseSymbolValue = Error(EmptyFunctionCall)
-    
+      
     match hierarchy with
     | TParenthesisHierarchy.Parenthesis(lbracket,elemList,rBracket) -> 
       match elemList with

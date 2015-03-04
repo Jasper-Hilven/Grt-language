@@ -27,7 +27,7 @@ open LexDefinitions
   and TStringParseSymbolValue =
   | Let of TParsLetValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue
   | FN of TParsFunctionValue * TParsRefereeSValue * list<TParsRefereeSValue> * TStringParseSymbolValue
-  | FNCall of TParsReferenceValue * list<TStringParseSymbolValue>
+  | FNCall of  list<TStringParseSymbolValue>
   | Float of TParsFloatValue
   | Int of TParsIntValue
   | Char of TParsCharValue
