@@ -49,6 +49,7 @@
     <Compile Include="CharDefinitions.fs" />
     <Compile Include="LexDefinitions.fs" />
     <Compile Include="ParserDefinitions.fs" />
+    <Compile Include="LinkedSymbolDefinitions.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
