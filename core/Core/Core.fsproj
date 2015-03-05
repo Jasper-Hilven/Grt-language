@@ -45,14 +45,14 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.fs" />
     <None Include="App.config" />
-    <Compile Include="Lexer.fs" />
     <Compile Include="LexValues.fs" />
-    <Compile Include="Parser.fs" />
-    <Compile Include="ParserHierarchyBuilder.fs" />
+    <Compile Include="Lexer.fs" />
     <Compile Include="ParserValues.fs" />
+    <Compile Include="ParserHierarchyBuilder.fs" />
+    <Compile Include="Parser.fs" />
     <Compile Include="SymbolLinker.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Definitions\Definitions.fsproj">
