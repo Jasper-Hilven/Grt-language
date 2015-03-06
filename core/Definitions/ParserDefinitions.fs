@@ -16,15 +16,17 @@
   type TArrayID   =      | ID of PID
   type TAssociativeID =  | ID of PID
 
+  type TRefereeCID   = {refereeID : TRefereeID    ; matchingID : TReferMatchingID}
+  type TReferringCID = {referringID : TReferringID; matchingID : TReferMatchingID} 
   type TParseID =
-  | Let of TLetID * list<TRefereeID * TParseID> * TParseID
-  | FN of TFnID * TRefereeID * list<TRefereeID> * TParseID
+  | Let of TLetID * list<TRefereeCID * TParseID> * TParseID
+  | FN of TFnID * TRefereeCID * list<TRefereeCID> * TParseID
   | FNCall of  TFnCallID * list<TParseID>
   | Float of TFloatID
   | Int of TIntID
   | Char of TCharID
   | String of TStringID 
-  | Referring of TReferringID * TReferMatchingID 
-  | Referee of TRefereeID * TReferMatchingID    
+  | Referring of TReferringCID 
+  | Referee of TRefereeCID    
   | Array of TArrayID * list<TParseID>
   | Associative of TAssociativeID * list<TParseID * TParseID>
