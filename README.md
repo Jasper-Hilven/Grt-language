@@ -1,7 +1,11 @@
 # grt
 
-A program language of which the properties are not yet totally defined.
+A statically typed Lisp dialect that can be compiled to javascript and java. Type inference will be used for the type checking. The language has a strong functional focus.
 
-## License
+## Current state
 
-Copyright © 2015 Jasper Hilven
+Working on the front-end of the compiler:
+  Finished clojure prototype.
+  Finished lexer
+  Finished parser
+  Finished symbol linker
