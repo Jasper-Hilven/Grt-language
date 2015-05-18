@@ -8,3 +8,11 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /bin/
+/core/FSharpBackEnd/bin
+/core/FSharpBackEnd/obj
+/core/Definitions/obj
+/core/Definitions/bin
+/core/Core/bin
+/core/Core/obj
+/core/Test/bin
+/core/Test/obj
