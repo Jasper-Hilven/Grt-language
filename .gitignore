@@ -16,3 +16,4 @@ pom.xml.asc
 /core/Core/obj
 /core/Test/bin
 /core/Test/obj
+/core/*.suo
