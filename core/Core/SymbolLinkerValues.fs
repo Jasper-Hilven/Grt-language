@@ -4,6 +4,7 @@
   //type TSLReferenceID 
   type TLinkedValue = 
   | Let of TLetID * List<TRefereeID * TLinkedValue > * TLinkedValue //
+  | Letrec of TLetrecID * List<TRefereeID * TLinkedValue > * TLinkedValue //
   | FN of  TFnID* TRefereeID * list<TRefereeID> * TLinkedValue
   | FNCall of TFnCallID * List<TLinkedValue>
   | Float of TFloatID

@@ -55,11 +55,18 @@
                                                     LinkSymbols(result,updatedTable))
           | DuplicatedMatchingIDs -> Error DuplicateName
         | DuplicatedMatchingIDs -> Error UnexpectedToComeHere
+    | TParseID.Letrec(letrecId,assignments,result)  -> 
+      let updatedTable = expandTable(symbolTable, List.map (fun (rcid: TRefereeCID,valueid: TParseID) -> rcid) assignments)
+      match updatedTable with
+      | DuplicatedMatchingIDs -> Error DuplicateName
+      | Succes updatedTableSucces -> 
+        let parsedArguments : ((TRefereeID * TLinkedValue) list) = List.map (fun (refID,parsID) -> (refID.refereeID, LinkSymbols(parsID,updatedTableSucces))) assignments
+        TLinkedValue.Letrec(letrecId, parsedArguments,LinkSymbols(result,updatedTableSucces)) 
     | TParseID.Let(letId,assignments,result)  -> 
       let updatedTable = expandTable(symbolTable, List.map (fun (rcid: TRefereeCID,valueid: TParseID) -> rcid) assignments)
       match updatedTable with
       | DuplicatedMatchingIDs -> Error DuplicateName
       | Succes updatedTableSucces -> 
         let parsedArguments : ((TRefereeID * TLinkedValue) list) = List.map (fun (refID,parsID) -> (refID.refereeID, LinkSymbols(parsID,updatedTableSucces))) assignments
-        TLinkedValue.Let(letId, parsedArguments,LinkSymbols(result,updatedTableSucces)) 
+        TLinkedValue.Let(letId, parsedArguments,LinkSymbols(result,updatedTableSucces)) //TODO: LET and LETREC are linked in the same way, change definitions 
     | TParseID.FNCall(id,arguments)  -> TLinkedValue.FNCall(id, mapChildrenWithCurrentTable(arguments)) 

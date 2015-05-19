@@ -7,6 +7,7 @@
   type TLexCharID =   | ID of TLID
   type TLexStringID = | ID of TLID
   type TLexLetID =    | ID of TLID
+  type TLexLetrecID = | ID of TLID
   type TLexFnID =     | ID of TLID
   type TLexRefID =    | ID of TLID
   type TLexLParenthesisID = | ID of TLID
@@ -32,6 +33,7 @@
   | Char of TLexCharID
   | String of TLexStringID
   | Let of TLexLetID
+  | Letrec of TLexLetrecID
   | Fn of TLexFnID
   | Ref of TLexRefID  
   | LParenthesis of TLexLParenthesisID

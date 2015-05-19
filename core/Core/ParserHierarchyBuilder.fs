@@ -9,6 +9,7 @@
   | Char of TLexCharID
   | String of TLexStringID
   | Let of TLexLetID
+  | Letrec of TLexLetrecID
   | Fn of TLexFnID
   | Ref of TLexRefID
   | Parenthesis of TLexLParenthesisID * list<TParenthesisHierarchy> * TLexRParenthesisID
@@ -40,6 +41,7 @@
     | TLexID.Int sint         ->  TPC(TParenthesisHierarchy.Int sint,countinc)
     | TLexID.String sstring   ->  TPC(TParenthesisHierarchy.String sstring,countinc)
     | TLexID.Let  slet        ->  TPC(TParenthesisHierarchy.Let slet ,countinc)
+    | TLexID.Letrec slet      ->  TPC(TParenthesisHierarchy.Letrec slet ,countinc)
     | TLexID.Fn  sfn          ->  TPC(TParenthesisHierarchy.Fn sfn ,countinc)
     | TLexID.Ref  sref        ->  TPC(TParenthesisHierarchy.Ref sref,countinc)
     | TLexID.RBracket     srb ->  TPC(TParenthesisHierarchy.Error(TParenthesisError.UnexpectedParenthesisLike(TLexRParenthesisLikeID.Bracket(srb))),countinc)
@@ -81,6 +83,7 @@
                         | Char (fchar) -> appendAndContinue(TParenthesisHierarchy.Char(fchar),lexed,count)
                         | String (fstring) -> appendAndContinue(TParenthesisHierarchy.String(fstring),lexed,count)
                         | Let (flet)  ->appendAndContinue(TParenthesisHierarchy.Let(flet),lexed,count)
+                        | Letrec (flet)  ->appendAndContinue(TParenthesisHierarchy.Letrec(flet),lexed,count)
                         | Fn (fFn)   ->appendAndContinue(TParenthesisHierarchy.Fn(fFn),lexed,count)
                         | Ref (fRef) -> appendAndContinue(TParenthesisHierarchy.Ref(fRef),lexed,count)
                         | Brackets(id,flist,rbr) ->appendAndContinue(TParenthesisHierarchy.Brackets(id,flist,rbr),lexed,count)

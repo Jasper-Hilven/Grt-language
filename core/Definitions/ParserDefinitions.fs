@@ -11,6 +11,7 @@
   type TCharID  =        | ID of PID
   type TStringID =       | ID of PID
   type TLetID     =      | ID of PID
+  type TLetrecID     =      | ID of PID
   type TFnID      =      | ID of PID
   type TFnCallID =       | ID of PID
   type TArrayID   =      | ID of PID
@@ -20,6 +21,7 @@
   type TReferringCID = {referringID : TReferringID; matchingID : TReferMatchingID} 
   type TParseID =
   | Let of TLetID * list<TRefereeCID * TParseID> * TParseID
+  | Letrec of TLetrecID * list<TRefereeCID * TParseID> * TParseID
   | FN of TFnID * TRefereeCID * list<TRefereeCID> * TParseID
   | FNCall of  TFnCallID * list<TParseID>
   | Float of TFloatID

@@ -8,11 +8,13 @@ open LexDefinitions
   type TParsReferenceValue = | LexID of TLexRefID
   type TParsStringValue =    | LexID of TLexStringID
   type TParsLetValue =       | LexID of TLexLetID
+  type TParsLetrecValue =    | LexID of TLexLetrecID
   type TParsFunctionValue =  | LexID of TLexFnID
   type TParseError = 
   | EmptyFunctionCall
   | NakedFunctionIdentifier of TLexFnID
   | NakedLetIdentifier of TLexLetID
+  | NakedLetrecIdentifier of TLexLetrecID
   | NotEndingParenthesesLike of TLexLParenthesisLikeID 
   | WrongEndingParenthesisLike of TLexLParenthesisLikeID * TLexRParenthesisLikeID
   | EndOfParsingUnexpected
@@ -27,6 +29,7 @@ open LexDefinitions
   | AssociativeUnevenAmountOfParameters
   and TStringParseSymbolValue =
   | Let of TParsLetValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue
+  | Letrec of TParsLetrecValue * list<TParsRefereeSValue * TStringParseSymbolValue> * TStringParseSymbolValue
   | FN of TParsFunctionValue * TParsRefereeSValue * list<TParsRefereeSValue> * TStringParseSymbolValue
   | FNCall of  list<TStringParseSymbolValue>
   | Float of TParsFloatValue

@@ -44,6 +44,7 @@
     | TParenthesisHierarchy.Fn(fid)               -> Error(TParseError.NakedFunctionIdentifier fid)
     | TParenthesisHierarchy.Int(iid)              -> Int(TParsIntValue.LexID iid)
     | TParenthesisHierarchy.Let(lid)              -> Error(TParseError.NakedLetIdentifier lid)
+    | TParenthesisHierarchy.Letrec(lid)              -> Error(TParseError.NakedLetrecIdentifier lid)
     | TParenthesisHierarchy.Ref(rid)              -> Reference(TParsReferenceValue.LexID rid)
     | TParenthesisHierarchy.String(sid)           -> String(TParsStringValue.LexID sid)
   
