@@ -5,9 +5,9 @@
   type TParseState = 
   | Char | EndChar | Id | Initial | Int | FloatDotDirect | Float | Space
   
-  let rec lex(text: string, currentLineNumber: int, currentState : TParseState, 
-              currentIndex :int, currentTextValue : string,
-              startingIndex :int, acc : (TPositionedLexValue list)) 
+  let rec lexrec(text: string, currentLineNumber: int, currentState : TParseState, 
+                 currentIndex :int, currentTextValue : string,
+                 startingIndex :int, acc : (TPositionedLexValue list)) 
           : (TPositionedLexValue list) = 
     if(text.Length < currentIndex) 
     then
@@ -17,19 +17,19 @@
       let updatedIndex = currentIndex + 1
       
       let finishAndContinue (token : TLexValue) = 
-        lex(text, currentLineNumber, TParseState.Initial, updatedIndex,"",updatedIndex,
+        lexrec(text, currentLineNumber, TParseState.Initial, updatedIndex,"",updatedIndex,
             {charPosition = currentIndex;lineNumber = currentLineNumber;lexValue = token}::acc )
       let errorOut(token : TLexValue,nextStart) = 
-        lex(text,currentLineNumber, TParseState.Initial, nextStart, "", nextStart, 
+        lexrec(text,currentLineNumber, TParseState.Initial, nextStart, "", nextStart, 
             {charPosition = currentIndex;lineNumber = currentLineNumber; lexValue = token}::acc)
       let appendAndContinue() = 
-        lex(text,currentLineNumber, currentState, updatedIndex, 
+        lexrec(text,currentLineNumber, currentState, updatedIndex, 
             currentTextValue + currentCharString,startingIndex,acc)
       let appendAndNext(nextstate : TParseState) = 
-        lex(text,currentLineNumber, nextstate, updatedIndex, currentTextValue + currentCharString,
+        lexrec(text,currentLineNumber, nextstate, updatedIndex, currentTextValue + currentCharString,
             startingIndex,acc)
       let finishAndNext(token : TLexValue, nextState: TParseState,nextIndex)  = 
-        lex(text, currentLineNumber, nextState, nextIndex, "",nextIndex, 
+        lexrec(text, currentLineNumber, nextState, nextIndex, "",nextIndex, 
             {charPosition = startingIndex;lineNumber = currentLineNumber; lexValue =  token }::acc)
       let devourId(text : string) = 
         if ("let".Equals(text)) then TLexValue.Let
@@ -80,3 +80,4 @@
       | FloatDotDirect -> AddAndRevert(Error(UndefinedFloatDot))
       | Float -> AddAndRevert(TLexValue.Float(currentTextValue))
       | Space -> AddAndRevert(Spacing(currentTextValue))
+  let lex (text: string): (TPositionedLexValue list) =  lexrec(text, 0, TParseState.Initial,0, "",0, list.Empty) 

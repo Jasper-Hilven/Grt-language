@@ -43,6 +43,7 @@
     <None Include="App.config" />
     <Compile Include="Parser.fs" />
     <None Include="packages.config" />
+    <Compile Include="Lexer.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">
