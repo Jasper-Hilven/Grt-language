@@ -31,14 +31,17 @@
       let finishAndNext(token : TLexValue, nextState: TParseState,nextIndex)  = 
         lex(text, currentLineNumber, nextState, nextIndex, "",nextIndex, 
             {charPosition = startingIndex;lineNumber = currentLineNumber; lexValue =  token }::acc)
-      
+      let devourId(text : string) = 
+        if ("let".Equals(text)) then TLexValue.Let
+        elif ("fn".Equals(text))then  TLexValue.Fn text
+        else  TLexValue.Id text
       match currentState with
       | Char -> if(smatch(validChar)) then appendAndNext(TParseState.EndChar)
                 else errorOut(Error(UnknownCharacter), updatedIndex)
       | EndChar ->  if(smatch(charChar)) then finishAndNext(TLexValue.Char(updatedString),Initial,updatedIndex)
                     else errorOut(Error(BadCharacterEnding), updatedIndex)
       | Id -> if(smatch(TextNumberChar)) then appendAndContinue()
-              elif (smatch(EndOtherChar)) then finishAndNext(TLexValue.Id(currentTextValue),TParseState.Initial,currentIndex)
+              elif (smatch(EndOtherChar)) then finishAndNext(devourId(currentTextValue),TParseState.Initial,currentIndex)
               else errorOut(Error(BadIDEnding),currentIndex)
       | Initial -> if(smatch(numbers)) then appendAndNext(TParseState.Int)
                    elif(smatch(textChar)) then appendAndNext(TParseState.Id)
