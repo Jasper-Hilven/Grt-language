@@ -32,8 +32,8 @@
         lexrec(text, currentLineNumber, nextState, nextIndex, "",nextIndex, 
             {charPosition = startingIndex;lineNumber = currentLineNumber; lexValue =  token }::acc)
       let devourId(text : string) = 
-        if ("let".Equals(text)) then TLexValue.Let
-        elif ("fn".Equals(text))then  TLexValue.Fn text
+        if (LexDefinitions.letText.Equals(text)) then TLexValue.Let
+        elif (LexDefinitions.functionText.Equals(text))then  TLexValue.Fn text
         else  TLexValue.Id text
       match currentState with
       | Char -> if(smatch(validChar)) then appendAndNext(TParseState.EndChar)

@@ -16,7 +16,9 @@
   type TLexRBracketID =     | ID of TLID
   type TLexLCBracketID =    | ID of TLID
   type TLexRCBracketID =    | ID of TLID
-  
+  let functionText = "fn"
+  let letText = "let"
+
   type TLexLParenthesisLikeID =  
   | Parenthesis of TLexLParenthesisID
   | Bracket of TLexLBracketID
