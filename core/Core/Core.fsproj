@@ -55,6 +55,7 @@
     <Compile Include="Parser.fs" />
     <Compile Include="SymbolLinkerValues.fs" />
     <Compile Include="SymbolLinker.fs" />
+    <Compile Include="TypeInferer.fs" />
     <Compile Include="Compiler.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
