@@ -31,11 +31,11 @@
   | TPC of TParenthesisHierarchy * int
   
   //Lets build the hierarchy
-  let rec BuildHierarchyRec(lexed : List<TCorrectLexID>, count : int) : TBHierarchy =
+  let rec BuildHierarchyRec(lexed : TCorrectLexID array, count : int) : TBHierarchy = 
     let countinc = count + 1
-    if(count >= lexed.Count) then  TPC(Error(EndOfParsing),countinc)
+    if(count >= lexed.Length) then  TPC(Error(EndOfParsing),countinc)
     else
-    let curSymbol = lexed.Item(count)
+    let curSymbol :TCorrectLexID = lexed.[count];
     match curSymbol with
     | TCorrectLexID.Char schar       ->  TPC(TParenthesisHierarchy.Char(schar),countinc)
     | TCorrectLexID.Float sfloat     ->  TPC(TParenthesisHierarchy.Float sfloat,countinc)
