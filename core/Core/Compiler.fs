@@ -14,4 +14,5 @@ let compile code =
   let cleanLexID = List.toArray(filterErrorAndSpace(lexID))
   let hierarchy = ParserHierarchyBuilder.BuildHierarchy(cleanLexID)
   let parsed = parseBuiltHierarchy(match hierarchy with | TBHierarchy.TPC(parsedHierarchy,_) -> parsedHierarchy)
+
   

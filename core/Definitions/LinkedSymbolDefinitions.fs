@@ -5,7 +5,7 @@
   | Let of ((TRefereeID * TLinkedParseSymbolID ) list) * TLinkedParseSymbolID //
   | Letrec of ((TRefereeID * TLinkedParseSymbolID ) list) * TLinkedParseSymbolID //
   | FN of TRefereeID * (TRefereeID list) * TLinkedParseSymbolID
-  | FNCall of TFnCallID * (TLinkedParseSymbolID list)
+  | FNCall of (TLinkedParseSymbolID list)
   | Float of TFloatID
   | Int of TIntID
   | Char of TCharID

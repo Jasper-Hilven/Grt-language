@@ -53,6 +53,7 @@
     <Compile Include="ParserValues.fs" />
     <Compile Include="ParserHierarchyBuilder.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="ParserValuesToIDMapper.fs" />
     <Compile Include="SymbolLinkerValues.fs" />
     <Compile Include="SymbolLinker.fs" />
     <Compile Include="TypeInferer.fs" />
